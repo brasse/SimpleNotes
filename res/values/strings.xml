@@ -2,4 +2,6 @@
 <resources>
     <string name="app_name">Simple Notes</string>
     <string name="no_notes">No notes here.</string>
+    <string name="add_note">Add note</string>
+    <string name="settings">Settings</string>
 </resources>
