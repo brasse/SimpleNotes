@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/credentials">
+        <EditTextPreference
+            android:title="@string/simplenote_email"
+            android:summary="@string/simplenote_email_desc"
+            android:key="simpleNoteEmail"/>
+        <EditTextPreference
+            android:title="@string/simplenote_password"
+            android:summary="@string/simplenote_password_desc"
+            android:key="simpleNotePassword" android:password="true"/>
+    </PreferenceCategory>
+</PreferenceScreen>

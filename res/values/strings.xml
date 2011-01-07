@@ -4,4 +4,9 @@
     <string name="no_notes">No notes here.</string>
     <string name="add_note">Add note</string>
     <string name="settings">Settings</string>
+    <string name="credentials">Credentials</string>
+    <string name="simplenote_email">Simplenote email</string>
+    <string name="simplenote_email_desc">Your Simplenote email</string>
+    <string name="simplenote_password">Simplenote password</string>
+    <string name="simplenote_password_desc">Your Simplenote password</string>
 </resources>

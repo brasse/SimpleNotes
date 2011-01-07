@@ -12,7 +12,10 @@
             </intent-filter>
         </activity>
 
-    </application>
+        <activity android:label="@string/app_name" android:name=".EditPreferences">
+        </activity>
+
+</application>
     <uses-sdk android:minSdkVersion="4" />
 
 </manifest> 
