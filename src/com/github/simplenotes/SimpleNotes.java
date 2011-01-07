@@ -30,6 +30,7 @@ public class SimpleNotes extends ListActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case ADD_NOTE_ID:
+            startActivity(new Intent(this, EditNote.class));
             return true;
         case SETTINGS_ID:
             startActivity(new Intent(this, EditPreferences.class));

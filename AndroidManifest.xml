@@ -15,6 +15,9 @@
         <activity android:label="@string/app_name" android:name=".EditPreferences">
         </activity>
 
+        <activity android:label="@string/app_name" android:name=".EditNote">
+        </activity>
+
 </application>
     <uses-sdk android:minSdkVersion="4" />
 
