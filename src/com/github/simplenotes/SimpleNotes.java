@@ -8,8 +8,8 @@ import android.view.MenuItem;
 
 public class SimpleNotes extends ListActivity {
 
-	public static final int ADD_NOTE_ID = Menu.FIRST;
-	public static final int SETTINGS_ID = Menu.FIRST + 1;
+    public static final int ADD_NOTE_ID = Menu.FIRST;
+    public static final int SETTINGS_ID = Menu.FIRST + 1;
 
     /** Called when the activity is first created. */
     @Override
