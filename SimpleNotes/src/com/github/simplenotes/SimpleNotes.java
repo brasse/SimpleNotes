@@ -11,11 +11,15 @@ public class SimpleNotes extends ListActivity {
     public static final int ADD_NOTE_ID = Menu.FIRST;
     public static final int SETTINGS_ID = Menu.FIRST + 1;
 
+    protected NotesDb mNotesDb;
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.notelist);
+        mNotesDb = new NotesDb(this);
+        mNotesDb.open();
     }
 
     @Override
