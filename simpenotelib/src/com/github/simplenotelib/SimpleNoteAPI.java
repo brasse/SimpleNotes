@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 
 public class SimpleNoteAPI {
 	private static final String LOG_TAG = "SimpleNoteAPI";
-	public static final String BASE_URL = "https://simple-note.appspot.com/api";
+	public static final String BASE_URL = "https://simple-note.appspot.com/api2";
 	public static final String LOGIN_PATH = "/login";
 	public static final String DATA_PATH = "/data";
 	public static final String INDEX_PATH = "/index";
