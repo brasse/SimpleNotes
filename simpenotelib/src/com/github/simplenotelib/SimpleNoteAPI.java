@@ -1,6 +1,5 @@
 package com.github.simplenotelib;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -9,7 +8,6 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLEncoder;
 import java.util.logging.Logger;
 
 public class SimpleNoteAPI {
@@ -23,7 +21,6 @@ public class SimpleNoteAPI {
 	private String email;
 	private String password;
 	
-	@SuppressWarnings("unused")
 	private String authToken;
 	public String getAuthToken() {
 		return this.authToken;
