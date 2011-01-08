@@ -31,14 +31,18 @@ public class SimpleNoteAPITest extends TestCase {
 
 	public void testSimpleNoteAPI() {
 		SimpleNoteAPI sn = new SimpleNoteAPI(email, password);
-		
+		Assert.assertNotNull(sn.getEmail());
 	}
 
 	public void testLogin() {
 		SimpleNoteAPI sn = new SimpleNoteAPI(email, password);
 		sn.login();
 		Assert.assertNotNull(sn.getAuthToken());
-
+	}
+	
+	public void testCreateNote() {
+		SimpleNoteAPI sn = new SimpleNoteAPI(email, password);
+		sn.login();
 		
 	}
 

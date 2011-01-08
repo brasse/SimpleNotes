@@ -78,5 +78,8 @@ public class SimpleNoteAPI {
 			// TODO: Retry a couple times then display message?
 		}
 	}
+	public String getEmail() {
+		return email;
+	}
 	
 }
