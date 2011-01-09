@@ -1,6 +1,3 @@
-package com.github.simplenotelib;
-
-import java.util.Date;
 /*
  * This POJO is based on the JSON document in the API2.
  * {
@@ -17,21 +14,26 @@ import java.util.Date;
 		tags	:	[	(Array	of	strings)	], 
 		content	:	(string,	data	content)
 	}
- */
-import java.util.List;
+*/
+package com.github.simplenotelib;
+
+import java.util.Collection;
 
 public class Note {
 	private String key;
 	private boolean deleted;
-	private Date modifydate;
-	private Date createdate;
+	private float modifydate;
+	private float createdate;
 	private int syncnum;
 	private int minversion;
 	private String sharekey;
 	private String publishkey;
-	private List<String> systemtags;
-	private List<String> tags;
+	private Collection<String> systemtags;
+	private Collection<String> tags;
 	private String content;
+	public Note() {
+		
+	}
 	public void setKey(String key) {
 		this.key = key;
 	}
@@ -44,16 +46,16 @@ public class Note {
 	public boolean isDeleted() {
 		return deleted;
 	}
-	public void setModifydate(Date modifydate) {
+	public void setModifydate(float modifydate) {
 		this.modifydate = modifydate;
 	}
-	public Date getModifydate() {
+	public float getModifydate() {
 		return modifydate;
 	}
-	public void setCreatedate(Date createdate) {
+	public void setCreatedate(float createdate) {
 		this.createdate = createdate;
 	}
-	public Date getCreatedate() {
+	public float getCreatedate() {
 		return createdate;
 	}
 	public void setSyncnum(int syncnum) {
@@ -80,16 +82,16 @@ public class Note {
 	public String getPublishkey() {
 		return publishkey;
 	}
-	public void setSystemtags(List<String> systemtags) {
+	public void setSystemtags(Collection<String> systemtags) {
 		this.systemtags = systemtags;
 	}
-	public List<String> getSystemtags() {
+	public Collection<String> getSystemtags() {
 		return systemtags;
 	}
-	public void setTags(List<String> tags) {
+	public void setTags(Collection<String> tags) {
 		this.tags = tags;
 	}
-	public List<String> getTags() {
+	public Collection<String> getTags() {
 		return tags;
 	}
 	public void setContent(String content) {

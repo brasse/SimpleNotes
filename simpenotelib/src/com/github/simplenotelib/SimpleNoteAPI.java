@@ -1,6 +1,7 @@
 package com.github.simplenotelib;
 
 import java.io.BufferedReader;
+import sun.misc.BASE64Encoder;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,27 +11,32 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.logging.Logger;
 
+import com.google.gson.Gson;
+
 public class SimpleNoteAPI {
-	private static final String LOG_TAG = "SimpleNoteAPI";
 	public static final String BASE_URL = "https://simple-note.appspot.com/api2";
-	public static final String LOGIN_PATH = "/login";
+	
+	public static final String LOGIN_URL = "https://simple-note.appspot.com/api/login";
 	public static final String DATA_PATH = "/data";
 	public static final String INDEX_PATH = "/index";
 
-	public static Logger Log = Logger.getLogger(LOG_TAG);
+	public static Logger Log = Logger.getLogger(SimpleNoteAPI.class.getName());
 	private String email;
 	private String password;
 
 	private String authToken;
+	private Gson gson;
 	public String getAuthToken() {
 		return this.authToken;
 	}
 	public SimpleNoteAPI(String email, String password) {
 		this.email = email;
 		this.password = password;
+		this.gson = new Gson();
+		
 	}
 
-	private BufferedReader connect(String url, String body) {
+	private BufferedReader connect(String url, String body, boolean encode) {
 		BufferedReader buffer = null;
 		try {
 			URL u = new URL(url);
@@ -39,7 +45,11 @@ public class SimpleNoteAPI {
 			OutputStream out = null;
 			try {
 				out = ucon.getOutputStream();
+				if(encode) {
+					body = new BASE64Encoder().encode(body.getBytes());
+				}
 				out.write(body.getBytes());
+				out.flush();
 			} finally {
 				if (out != null) try { out.close(); } catch (IOException logOrIgnore) {}
 			}
@@ -57,29 +67,39 @@ public class SimpleNoteAPI {
 		return buffer;
 	}
 
-	private String requestURL(String url, String body) throws IOException {
-		BufferedReader buff = connect(url, body);
+	private String requestURL(String url, String body, boolean encode) throws IOException {
+		BufferedReader buff = connect(url, body, encode);
 		ByteArrayOutputStream baf = new ByteArrayOutputStream(50);
 		int current = 0;
 		while((current = buff.read()) != -1){
 			baf.write((byte)current);
 		}
-		return new String(baf.toByteArray()); 
+		String response = new String(baf.toByteArray()); 
+		System.out.println(response);
+		return response;
 	}
 
 
-	public void login() {
-		String url = BASE_URL + LOGIN_PATH; 
+	public void login() throws IOException {
+		String url = LOGIN_URL; 
 		String body="email=" + this.email + "&password=" + this.password;
-		try {
-			this.authToken = requestURL(url, body);
-		} catch(IOException e) {
-			Log.info("IO login failure");
-			// TODO: Retry a couple times then display message?
-		}
+		
+		this.authToken = requestURL(url, body, true);
 	}
 	public String getEmail() {
 		return email;
+	}
+	private Note noteFromJSON(String json) {
+		System.out.println("Made it before fromJSON");
+		return this.gson.fromJson(json, Note.class);
+	}
+	
+	public Note add(Note note) throws IOException {
+		String url = BASE_URL + DATA_PATH + "?auth=" + this.authToken + "&email=" + this.email;
+		String body = gson.toJson(note);
+		String newNoteJSON = requestURL(url, body, false);
+		return noteFromJSON(newNoteJSON);
+		
 	}
 
 }
