@@ -16,11 +16,11 @@ public class SimpleNoteAPI {
 	public static final String LOGIN_PATH = "/login";
 	public static final String DATA_PATH = "/data";
 	public static final String INDEX_PATH = "/index";
-	
+
 	public static Logger Log = Logger.getLogger(LOG_TAG);
 	private String email;
 	private String password;
-	
+
 	private String authToken;
 	public String getAuthToken() {
 		return this.authToken;
@@ -29,7 +29,7 @@ public class SimpleNoteAPI {
 		this.email = email;
 		this.password = password;
 	}
-	
+
 	private BufferedReader connect(String url, String body) {
 		BufferedReader buffer = null;
 		try {
@@ -53,10 +53,10 @@ public class SimpleNoteAPI {
 			// TODO: Possible retry for x times before falure since could be network issue
 			Log.info("Connection failure " + url + "\nException Message: " + e.getMessage());
 		}
-		
+
 		return buffer;
 	}
-	
+
 	private String requestURL(String url, String body) throws IOException {
 		BufferedReader buff = connect(url, body);
 		ByteArrayOutputStream baf = new ByteArrayOutputStream(50);
@@ -66,8 +66,8 @@ public class SimpleNoteAPI {
 		}
 		return new String(baf.toByteArray()); 
 	}
-	
-	
+
+
 	public void login() {
 		String url = BASE_URL + LOGIN_PATH; 
 		String body="email=" + this.email + "&password=" + this.password;
@@ -81,5 +81,5 @@ public class SimpleNoteAPI {
 	public String getEmail() {
 		return email;
 	}
-	
+
 }

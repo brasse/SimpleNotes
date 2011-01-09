@@ -17,7 +17,7 @@ import java.util.Date;
 		tags	:	[	(Array	of	strings)	], 
 		content	:	(string,	data	content)
 	}
-*/
+ */
 import java.util.List;
 
 public class Note {
