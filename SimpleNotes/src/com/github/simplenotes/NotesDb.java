@@ -4,9 +4,12 @@ import java.util.List;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import com.github.simplenotelib.Note;
 
 public class NotesDb {
 
@@ -20,12 +23,16 @@ public class NotesDb {
     public static final String KEY_TAGS = "tags";
     public static final String KEY_CONTENT = "content";
 
+    public static final String KEY_NOTEID = "noteid";
+    public static final String KEY_NAME = "name";
+
     private static final String DATABASE_NAME = "data";
-    private static final String DATABASE_TABLE = "notes";
+    private static final String DATABASE_NOTES_TABLE = "notes";
+    private static final String DATABASE_TAGS_TABLE = "tags";
     private static final int DATABASE_VERSION = 1;
 
-    private static final String DATABASE_CREATE =
-        "create table " + DATABASE_TABLE + " (" +
+    private static final String DATABASE_CREATE_NOTES =
+        "create table " + DATABASE_NOTES_TABLE + " (" +
         KEY_ROWID + " integer primary key autoincrement, " +
         KEY_KEY + " text, " + 
         KEY_MODIFYDATE + " text, " +
@@ -33,6 +40,14 @@ public class NotesDb {
         KEY_SYNCNUM + " integer, " +
         KEY_VERSION + " integer, " +
         KEY_CONTENT + " text);";
+
+    private static final String DATABASE_CREATE_TAGS =
+        "create table " + DATABASE_TAGS_TABLE + " (" +
+        KEY_ROWID + " integer primary key autoincrement, " +
+        KEY_NAME + " text, " + 
+        KEY_NOTEID + " integer, " +
+        "foreign key(" + KEY_NOTEID + 
+        ") references " + DATABASE_NOTES_TABLE + " (" + KEY_ROWID + ");";
 
     private final Context mCtx;
 
@@ -47,7 +62,8 @@ public class NotesDb {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-            db.execSQL(DATABASE_CREATE);
+            db.execSQL(DATABASE_CREATE_NOTES);
+            db.execSQL(DATABASE_CREATE_TAGS);
         }
 
         @Override
@@ -82,6 +98,17 @@ public class NotesDb {
     public long createNote(String content, List<String> tags) {
         ContentValues values = new ContentValues();
         values.put(KEY_CONTENT, content);
-        return mDb.insert(DATABASE_TABLE, null, values);
+        return mDb.insert(DATABASE_NOTES_TABLE, null, values);
+    }
+
+    public Note getNote(long id) {
+        Cursor cursor =
+            mDb.query(DATABASE_NOTES_TABLE,
+                      new String[] {KEY_ROWID, KEY_KEY, KEY_CONTENT},
+                      KEY_ROWID + "=" + id,
+                      null, null, null, null);
+        Note note = new Note();
+        note.setContent(cursor.getString(2));
+        return note;
     }
 }
