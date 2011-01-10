@@ -1,5 +1,8 @@
 package com.github.simplenotes;
 
+import java.util.List;
+
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -76,4 +79,9 @@ public class NotesDb {
         mDbHelper.close();
     }
 
+    public long createNote(String content, List<String> tags) {
+        ContentValues values = new ContentValues();
+        values.put(KEY_CONTENT, content);
+        return mDb.insert(DATABASE_TABLE, null, values);
+    }
 }
