@@ -107,8 +107,13 @@ public class NotesDb {
                       new String[] {KEY_ROWID, KEY_KEY, KEY_CONTENT},
                       KEY_ROWID + "=" + id,
                       null, null, null, null);
+        if (!cursor.moveToFirst()) {
+            // Cursor is probably empty.
+            return null;
+        }
         Note note = new Note();
         note.setContent(cursor.getString(2));
+        cursor.close();
         return note;
     }
 }
