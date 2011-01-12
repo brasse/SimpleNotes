@@ -1,14 +1,19 @@
 package com.github.simplenotes.test;
 
-import android.test.AndroidTestCase;
+import com.github.simplenotelib.Note;
 import com.github.simplenotes.NotesDb;
+
+import android.test.AndroidTestCase;
 
 public class NotesDbTest extends AndroidTestCase {
 
-    public void testCanCreateNoteWithoutTags() {
+    public void testCanCreateNoteWithoutTagsAndReadIt() {
         NotesDb db = new NotesDb(getContext());
         db.open();
-        long id = db.createNote("foo bar baz", null);
+        String content = "foo bar baz";
+        long id = db.createNote(content, null);
         assertTrue("Note creation failed.", id != -1);
+        Note note = db.getNote(id);
+        assertEquals(content, note.getContent());
     }
 }
