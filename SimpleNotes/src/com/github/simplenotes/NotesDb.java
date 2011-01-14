@@ -15,39 +15,49 @@ public class NotesDb {
 
     public static final String KEY_ROWID = "_id";
     public static final String KEY_KEY = "key";
+    public static final String KEY_CONTENT = "content";
     public static final String KEY_MODIFYDATE = "modifydate";
     public static final String KEY_CREATEDATE = "createdate";
     public static final String KEY_SYNCNUM = "syncnum";
     public static final String KEY_VERSION = "version";
+    public static final String KEY_SHAREKEY = "sharekey";
+    public static final String KEY_PUBLISHKEY = "publishkey";
     public static final String KEY_SYSTEMTAGS = "systemtags";
     public static final String KEY_TAGS = "tags";
-    public static final String KEY_CONTENT = "content";
+    public static final String KEY_DELETED = "deleted";
+    public static final String KEY_PINNED = "pinned";
+    public static final String KEY_UNREAD = "unread";
 
     public static final String KEY_NOTEID = "noteid";
     public static final String KEY_NAME = "name";
 
     private static final String DATABASE_NAME = "data";
-    private static final String DATABASE_NOTES_TABLE = "notes";
-    private static final String DATABASE_TAGS_TABLE = "tags";
+    private static final String DATABASE_TABLE_NOTES = "notes";
+    private static final String DATABASE_TABLE_TAGS = "tags";
     private static final int DATABASE_VERSION = 1;
 
     private static final String DATABASE_CREATE_NOTES =
-        "create table " + DATABASE_NOTES_TABLE + " (" +
+        "create table " + DATABASE_TABLE_NOTES + " (" +
         KEY_ROWID + " integer primary key autoincrement, " +
         KEY_KEY + " text, " + 
+        KEY_CONTENT + " text, " +
         KEY_MODIFYDATE + " text, " +
         KEY_CREATEDATE + " text, " +
         KEY_SYNCNUM + " integer, " +
         KEY_VERSION + " integer, " +
-        KEY_CONTENT + " text);";
+        KEY_SHAREKEY + " text, " +
+        KEY_PUBLISHKEY + " text, " +
+        KEY_DELETED + " integer, " +
+        KEY_PINNED + " integer, " +
+        KEY_UNREAD + " integer);";
 
     private static final String DATABASE_CREATE_TAGS =
-        "create table " + DATABASE_TAGS_TABLE + " (" +
+        "create table " + DATABASE_TABLE_TAGS + " (" +
         KEY_ROWID + " integer primary key autoincrement, " +
         KEY_NAME + " text, " + 
         KEY_NOTEID + " integer, " +
         "foreign key(" + KEY_NOTEID + 
-        ") references " + DATABASE_NOTES_TABLE + " (" + KEY_ROWID + ");";
+        ") references " + DATABASE_TABLE_NOTES + " (" + KEY_ROWID + ");";
 
     private final Context mCtx;
 
@@ -98,12 +108,12 @@ public class NotesDb {
     public long createNote(String content, List<String> tags) {
         ContentValues values = new ContentValues();
         values.put(KEY_CONTENT, content);
-        return mDb.insert(DATABASE_NOTES_TABLE, null, values);
+        return mDb.insert(DATABASE_TABLE_NOTES, null, values);
     }
 
     public Note getNote(long id) {
         Cursor cursor =
-            mDb.query(DATABASE_NOTES_TABLE,
+            mDb.query(DATABASE_TABLE_NOTES,
                       new String[] {KEY_ROWID, KEY_KEY, KEY_CONTENT},
                       KEY_ROWID + "=" + id,
                       null, null, null, null);
