@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.github.simplenotelib.Note;
 
@@ -31,7 +32,7 @@ public class NotesDb {
     public static final String KEY_NOTEID = "noteid";
     public static final String KEY_NAME = "name";
 
-    private static final String DATABASE_NAME = "data";
+    private static final String DATABASE_NAME = "notes.db";
     private static final String DATABASE_TABLE_NOTES = "notes";
     private static final String DATABASE_TABLE_TAGS = "tags";
     private static final int DATABASE_VERSION = 1;
@@ -57,7 +58,9 @@ public class NotesDb {
         KEY_NAME + " text, " + 
         KEY_NOTEID + " integer, " +
         "foreign key(" + KEY_NOTEID + 
-        ") references " + DATABASE_TABLE_NOTES + " (" + KEY_ROWID + ");";
+        ") references " + DATABASE_TABLE_NOTES + " (" + KEY_ROWID + "));";
+
+    private static final String TAG = "NotesDb";
 
     private final Context mCtx;
 
@@ -72,6 +75,7 @@ public class NotesDb {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
+            Log.i(TAG, "Creating database.");
             db.execSQL(DATABASE_CREATE_NOTES);
             db.execSQL(DATABASE_CREATE_TAGS);
         }
@@ -96,6 +100,7 @@ public class NotesDb {
      * @throws SQLException if the database could be neither opened or created
      */
     public NotesDb open() throws SQLException {
+        Log.i(TAG, "Opening database.");
         mDbHelper = new DatabaseHelper(mCtx);
         mDb = mDbHelper.getWritableDatabase();
         return this;
@@ -111,18 +116,24 @@ public class NotesDb {
         return mDb.insert(DATABASE_TABLE_NOTES, null, values);
     }
 
+    private static final String QUERY_GET_NOTE =
+        "select " +
+        DATABASE_TABLE_NOTES + "." + KEY_ROWID + " as id, " +
+        DATABASE_TABLE_NOTES + "." + KEY_CONTENT + ", " +
+        "group_concat(" + DATABASE_TABLE_TAGS + "." + KEY_NAME + ") " +
+        "from " + DATABASE_TABLE_NOTES + " left join " + DATABASE_TABLE_TAGS +
+        " on id = " + DATABASE_TABLE_TAGS + "." + KEY_NOTEID + " " +
+        "where id = ?;";
+
     public Note getNote(long id) {
         Cursor cursor =
-            mDb.query(DATABASE_TABLE_NOTES,
-                      new String[] {KEY_ROWID, KEY_KEY, KEY_CONTENT},
-                      KEY_ROWID + "=" + id,
-                      null, null, null, null);
+            mDb.rawQuery(QUERY_GET_NOTE, new String[] {String.valueOf(id)});
         if (!cursor.moveToFirst()) {
             // Cursor is probably empty.
             return null;
         }
         Note note = new Note();
-        note.setContent(cursor.getString(2));
+        note.setContent(cursor.getString(1));
         cursor.close();
         return note;
     }
