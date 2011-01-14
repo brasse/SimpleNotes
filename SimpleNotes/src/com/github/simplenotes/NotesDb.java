@@ -41,16 +41,16 @@ public class NotesDb {
         "create table " + DATABASE_TABLE_NOTES + " (" +
         KEY_ROWID + " integer primary key autoincrement, " +
         KEY_KEY + " text, " + 
-        KEY_CONTENT + " text, " +
+        KEY_CONTENT + " text not null, " +
         KEY_MODIFYDATE + " text, " +
         KEY_CREATEDATE + " text, " +
         KEY_SYNCNUM + " integer, " +
         KEY_VERSION + " integer, " +
         KEY_SHAREKEY + " text, " +
         KEY_PUBLISHKEY + " text, " +
-        KEY_DELETED + " integer, " +
-        KEY_PINNED + " integer, " +
-        KEY_UNREAD + " integer);";
+        KEY_DELETED + " integer not null default 0, " +
+        KEY_PINNED + " integer not null default 0, " +
+        KEY_UNREAD + " integer not null default 0);";
 
     private static final String DATABASE_CREATE_TAGS =
         "create table " + DATABASE_TABLE_TAGS + " (" +
