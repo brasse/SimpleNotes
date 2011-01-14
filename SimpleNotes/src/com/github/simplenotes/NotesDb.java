@@ -120,6 +120,7 @@ public class NotesDb {
         "select " +
         DATABASE_TABLE_NOTES + "." + KEY_ROWID + " as id, " +
         DATABASE_TABLE_NOTES + "." + KEY_CONTENT + ", " +
+        DATABASE_TABLE_NOTES + "." + KEY_DELETED + ", " +
         "group_concat(" + DATABASE_TABLE_TAGS + "." + KEY_NAME + ") " +
         "from " + DATABASE_TABLE_NOTES + " left join " + DATABASE_TABLE_TAGS +
         " on id = " + DATABASE_TABLE_TAGS + "." + KEY_NOTEID + " " +
@@ -134,6 +135,7 @@ public class NotesDb {
         }
         Note note = new Note();
         note.setContent(cursor.getString(1));
+        note.setDeleted(cursor.getInt(2) != 0);
         cursor.close();
         return note;
     }

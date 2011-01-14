@@ -15,5 +15,6 @@ public class NotesDbTest extends AndroidTestCase {
         assertTrue("Note creation failed.", id != -1);
         Note note = db.getNote(id);
         assertEquals(content, note.getContent());
+        assertEquals(false, note.isDeleted());
     }
 }
