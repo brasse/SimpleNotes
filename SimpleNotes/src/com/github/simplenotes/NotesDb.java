@@ -10,8 +10,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.github.simplenotelib.Note;
-
 public class NotesDb {
 
     public static final String KEY_ROWID = "_id";

@@ -1,6 +1,6 @@
 package com.github.simplenotes.test;
 
-import com.github.simplenotelib.Note;
+import com.github.simplenotes.Note;
 import com.github.simplenotes.NotesDb;
 
 import android.test.AndroidTestCase;
