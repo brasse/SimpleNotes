@@ -1,6 +1,8 @@
 package com.github.simplenotes;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -29,6 +31,7 @@ public class NotesDb {
 
     public static final String KEY_NOTEID = "noteid";
     public static final String KEY_NAME = "name";
+    public static final String KEY_POS = "pos";
 
     private static final String DATABASE_NAME = "notes.db";
     private static final String DATABASE_TABLE_NOTES = "notes";
@@ -53,8 +56,9 @@ public class NotesDb {
     private static final String DATABASE_CREATE_TAGS =
         "create table " + DATABASE_TABLE_TAGS + " (" +
         KEY_ROWID + " integer primary key autoincrement, " +
-        KEY_NAME + " text, " + 
-        KEY_NOTEID + " integer, " +
+        KEY_NAME + " text not null, " + 
+        KEY_POS + " integer not null, " + 
+        KEY_NOTEID + " integer not null, " +
         "foreign key(" + KEY_NOTEID + 
         ") references " + DATABASE_TABLE_NOTES + " (" + KEY_ROWID + "));";
 
@@ -109,9 +113,31 @@ public class NotesDb {
     }
 
     public long createNote(String content, List<String> tags) {
-        ContentValues values = new ContentValues();
-        values.put(KEY_CONTENT, content);
-        return mDb.insert(DATABASE_TABLE_NOTES, null, values);
+        mDb.beginTransaction();
+        try {
+            // Create note.
+            ContentValues noteValues = new ContentValues();
+            noteValues.put(KEY_CONTENT, content);
+            long noteId = 
+                mDb.insertOrThrow(DATABASE_TABLE_NOTES, null, noteValues); 
+            // Add tags to note.
+            if (tags != null) {
+                ListIterator<String> i = tags.listIterator();
+                while (i.hasNext()) {
+                    int index = i.nextIndex();
+                    String tag = i.next();
+                    ContentValues tagValues = new ContentValues();
+                    tagValues.put(KEY_NAME, tag);
+                    tagValues.put(KEY_POS, index);
+                    tagValues.put(KEY_NOTEID, noteId);
+                    mDb.insertOrThrow(DATABASE_TABLE_TAGS, null, tagValues);
+                }
+            }
+            mDb.setTransactionSuccessful();
+            return noteId;
+        } finally {
+            mDb.endTransaction();
+        }
     }
 
     private static final String QUERY_GET_NOTE =
@@ -119,10 +145,10 @@ public class NotesDb {
         DATABASE_TABLE_NOTES + "." + KEY_ROWID + " as id, " +
         DATABASE_TABLE_NOTES + "." + KEY_CONTENT + ", " +
         DATABASE_TABLE_NOTES + "." + KEY_DELETED + ", " +
-        "group_concat(" + DATABASE_TABLE_TAGS + "." + KEY_NAME + ") " +
-        "from " + DATABASE_TABLE_NOTES + " left join " + DATABASE_TABLE_TAGS +
+        DATABASE_TABLE_TAGS + "." + KEY_NAME +
+        " from " + DATABASE_TABLE_NOTES + " left join " + DATABASE_TABLE_TAGS +
         " on id = " + DATABASE_TABLE_TAGS + "." + KEY_NOTEID + " " +
-        "where id = ?;";
+        "where id = ? order by " + DATABASE_TABLE_TAGS + "." + KEY_POS + ";";
 
     public Note getNote(long id) {
         Cursor cursor =
@@ -134,6 +160,18 @@ public class NotesDb {
         Note note = new Note();
         note.setContent(cursor.getString(1));
         note.setDeleted(cursor.getInt(2) != 0);
+
+        // Get the tags.
+        ArrayList<String> tags = new ArrayList<String>();
+        while (!cursor.isAfterLast()) {
+            String tag = cursor.getString(3);
+            if (tag != null) {
+                tags.add(tag);
+            }
+            cursor.moveToNext();
+        }
+        note.setTags(tags);
+
         cursor.close();
         return note;
     }
