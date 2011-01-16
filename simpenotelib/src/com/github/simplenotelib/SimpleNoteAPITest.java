@@ -48,10 +48,21 @@ public class SimpleNoteAPITest extends TestCase {
 		sn.login();
 		newNote = sn.add(n);
 		Assert.assertNotNull(newNote);
-		Assert.assertEquals(n.getContent(), newNote.getContent());
 		Assert.assertNotNull(newNote.getKey());
+//		Assert.assertEquals(n.getContent(), newNote.getContent());
+	}
+	
+	public void testGetNote() throws IOException {
+		SimpleNoteAPI sn = new SimpleNoteAPI(email, password);
+		sn.login();
+		Note newNote = null;
+		Note n = new Note();
+		String content = "This is the minimal content needed";
+		n.setContent(content);
+		newNote = sn.add(n);
+		newNote = sn.get(newNote.getKey());
+		Assert.assertEquals(n.getContent(), newNote.getContent());
 		
-
 	}
 
 }

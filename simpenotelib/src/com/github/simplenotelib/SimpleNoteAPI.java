@@ -36,7 +36,7 @@ public class SimpleNoteAPI {
 		
 	}
 
-	private BufferedReader connect(String url, String body, boolean encode) {
+	private BufferedReader connect(String url, String body, boolean encode) throws IOException{
 		BufferedReader buffer = null;
 		try {
 			URL u = new URL(url);
@@ -59,15 +59,13 @@ public class SimpleNoteAPI {
 			// TODO: Should provide some kind of error message for the user
 			// this would also mean something is really broken and should get 
 			// logged to an online server so that can fix later on.
-		} catch (IOException e) {
-			// TODO: Possible retry for x times before falure since could be network issue
-			Log.info("Connection failure " + url + "\nException Message: " + e.getMessage());
 		}
 
 		return buffer;
 	}
 
 	private String requestURL(String url, String body, boolean encode) throws IOException {
+		System.out.println("Body is: " + body);
 		BufferedReader buff = connect(url, body, encode);
 		ByteArrayOutputStream baf = new ByteArrayOutputStream(50);
 		int current = 0;
@@ -75,7 +73,7 @@ public class SimpleNoteAPI {
 			baf.write((byte)current);
 		}
 		String response = new String(baf.toByteArray()); 
-		System.out.println(response);
+		System.out.println("Repsonse is: " + response);
 		return response;
 	}
 
@@ -99,6 +97,12 @@ public class SimpleNoteAPI {
 		String body = gson.toJson(note);
 		String newNoteJSON = requestURL(url, body, false);
 		return noteFromJSON(newNoteJSON);
+	}
+	
+	public Note get(String key) throws IOException {
+		String url = BASE_URL + DATA_PATH + "/" + key + "?auth=" + this.authToken + "&email=" + this.email;
+		String noteJSON = requestURL(url, "", false);
+		return noteFromJSON(noteJSON);
 		
 	}
 
