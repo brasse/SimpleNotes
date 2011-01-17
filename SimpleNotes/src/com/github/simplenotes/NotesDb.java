@@ -250,4 +250,29 @@ public class NotesDb {
         }
         return noteFrom(cursor);
     }
+
+    private static final String QUERY_GET_ALL_NOTES =
+        "select " +
+        DATABASE_TABLE_NOTES + "." + KEY_ROWID + " as id, " +
+        DATABASE_TABLE_NOTES + "." + KEY_KEY + ", " +
+        DATABASE_TABLE_NOTES + "." + KEY_DELETED + ", " +
+        DATABASE_TABLE_NOTES + "." + KEY_MODIFYDATE + ", " +
+        DATABASE_TABLE_NOTES + "." + KEY_CREATEDATE + ", " +
+        DATABASE_TABLE_NOTES + "." + KEY_SYNCNUM + ", " +
+        DATABASE_TABLE_NOTES + "." + KEY_VERSION + ", " +
+        DATABASE_TABLE_NOTES + "." + KEY_MINVERSION + ", " +
+        DATABASE_TABLE_NOTES + "." + KEY_SHAREKEY + ", " +
+        DATABASE_TABLE_NOTES + "." + KEY_PUBLISHKEY + ", " +
+        DATABASE_TABLE_NOTES + "." + KEY_CONTENT + ", " +
+        DATABASE_TABLE_NOTES + "." + KEY_PINNED + ", " +
+        DATABASE_TABLE_NOTES + "." + KEY_UNREAD + ", " +
+        DATABASE_TABLE_TAGS + "." + KEY_NAME +
+        " from " + DATABASE_TABLE_NOTES + " left join " + DATABASE_TABLE_TAGS +
+        " on id = " + DATABASE_TABLE_TAGS + "." + KEY_NOTEID + " " +
+        "order by " + DATABASE_TABLE_NOTES + "." + KEY_PINNED + " desc, id," + 
+        DATABASE_TABLE_TAGS + "." + KEY_POS + ";";
+
+    public Cursor getAllNotes() {
+        return mDb.rawQuery(QUERY_GET_ALL_NOTES, null);
+    }
 }
