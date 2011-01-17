@@ -11,6 +11,7 @@ public class Note {
     private Date modifyDate;
     private Date createDate;
     private int syncNum;
+    private int version;
     private int minVersion;
     private String shareKey;
     private String publishKey;
@@ -60,6 +61,12 @@ public class Note {
     public void setSyncNum(int syncNum) {
         this.syncNum = syncNum;
     }
+    public int getVersion() {
+        return version;
+    }
+    public void setVersion(int version) {
+        this.version = version;
+    }
     public int getMinVersion() {
         return minVersion;
     }
@@ -95,5 +102,12 @@ public class Note {
     }
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public boolean isPinned() {
+        return systemTags.contains("pinned");
+    }
+    public boolean isUnread() {
+        return systemTags.contains("unread");
     }
 }
