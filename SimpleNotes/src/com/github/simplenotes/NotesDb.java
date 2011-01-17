@@ -130,6 +130,17 @@ public class NotesDb {
         }
     }
 
+    public void deleteAllNotes() {
+        mDb.beginTransaction();
+        try {
+            mDb.delete(DATABASE_TABLE_TAGS, null, null);
+            mDb.delete(DATABASE_TABLE_NOTES, null, null);
+            mDb.setTransactionSuccessful();
+        } finally {
+            mDb.endTransaction();
+        }
+    }
+
     public long createNote(String content, List<String> tags) {
         mDb.beginTransaction();
         try {
