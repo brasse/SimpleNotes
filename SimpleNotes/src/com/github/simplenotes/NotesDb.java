@@ -173,6 +173,43 @@ public class NotesDb {
         }
     }
 
+    public Note noteFrom(Cursor cursor) {
+        Note note = new Note();
+        note.setId(cursor.getLong(0));
+        note.setKey(cursor.getString(1));
+        note.setDeleted(cursor.getInt(2) != 0);
+        note.setModifyDate(new Date(cursor.getLong(3)));
+        note.setCreateDate(new Date(cursor.getLong(4)));
+        note.setSyncNum(cursor.getInt(5));
+        note.setVersion(cursor.getInt(6));
+        note.setMinVersion(cursor.getInt(7));
+        note.setShareKey(cursor.getString(8));
+        note.setPublishKey(cursor.getString(9));
+        note.setContent(cursor.getString(10));
+
+        ArrayList<String> systemTags = new ArrayList<String>();
+        if (cursor.getInt(11) != 0) {
+            systemTags.add("pinned");
+        }
+        if (cursor.getInt(12) != 0) {
+            systemTags.add("unread");
+        }
+        note.setSystemTags(systemTags);
+
+        // Get the tags.
+        ArrayList<String> tags = new ArrayList<String>();
+        while (!cursor.isAfterLast() && cursor.getLong(0) == note.getId()) {
+            String tag = cursor.getString(13);
+            if (tag != null) {
+                tags.add(tag);
+            }
+            cursor.moveToNext();
+        }
+        note.setTags(tags);
+
+        return note;
+    }
+
     private static final String QUERY_GET_NOTE =
         "select " +
         DATABASE_TABLE_NOTES + "." + KEY_ROWID + " as id, " +
@@ -200,40 +237,6 @@ public class NotesDb {
             // Cursor is probably empty.
             return null;
         }
-        Note note = new Note();
-        note.setId(cursor.getLong(0));
-        note.setKey(cursor.getString(1));
-        note.setDeleted(cursor.getInt(2) != 0);
-        note.setModifyDate(new Date(cursor.getLong(3)));
-        note.setCreateDate(new Date(cursor.getLong(4)));
-        note.setSyncNum(cursor.getInt(5));
-        note.setVersion(cursor.getInt(6));
-        note.setMinVersion(cursor.getInt(7));
-        note.setShareKey(cursor.getString(8));
-        note.setPublishKey(cursor.getString(9));
-        note.setContent(cursor.getString(10));
-
-        ArrayList<String> systemTags = new ArrayList<String>();
-        if (cursor.getInt(11) != 0) {
-            systemTags.add("pinned");
-        }
-        if (cursor.getInt(12) != 0) {
-            systemTags.add("unread");
-        }
-        note.setSystemTags(systemTags);
-
-        // Get the tags.
-        ArrayList<String> tags = new ArrayList<String>();
-        while (!cursor.isAfterLast()) {
-            String tag = cursor.getString(13);
-            if (tag != null) {
-                tags.add(tag);
-            }
-            cursor.moveToNext();
-        }
-        note.setTags(tags);
-
-        cursor.close();
-        return note;
+        return noteFrom(cursor);
     }
 }
