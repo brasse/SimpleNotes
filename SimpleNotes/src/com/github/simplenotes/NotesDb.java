@@ -195,7 +195,7 @@ public class NotesDb {
         }
     }
 
-    public Note noteFrom(Cursor cursor) {
+    public static Note noteFrom(Cursor cursor) {
         Note note = new Note();
         note.setId(cursor.getLong(0));
         note.setKey(cursor.getString(1));

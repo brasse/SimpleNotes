@@ -1,5 +1,8 @@
 package com.github.simplenotes;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.database.DataSetObserver;
@@ -12,13 +15,15 @@ import android.widget.TextView;
 public class NotesCursorAdapter implements ListAdapter {
 
     Context ctx;
-    Cursor notes;
+    Cursor cursor;
     int count;
+    List<Note> notes;
     
     public NotesCursorAdapter(Context ctx, Cursor notes, int count) {
         this.ctx = ctx;
-        this.notes = notes;
+        this.cursor = notes;
         this.count = count;
+        this.notes = new ArrayList<Note>();
     }
 
     @Override
@@ -37,14 +42,23 @@ public class NotesCursorAdapter implements ListAdapter {
     }
 
     @Override
-    public Object getItem(int position) {
-        // try to leave unimplemented
-        return null;
+    public Note getItem(int position) {
+        if (position < notes.size()) {
+            return notes.get(position);
+        }
+
+        int cursorPosition = notes.size();
+        while (cursorPosition <= position) {
+            Note note = NotesDb.noteFrom(cursor);
+            notes.add(note);
+            ++cursorPosition;
+        }
+        return notes.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        return position;
+        return getItem(position).getId();
     }
 
     @Override
