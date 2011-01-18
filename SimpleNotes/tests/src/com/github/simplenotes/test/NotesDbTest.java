@@ -149,4 +149,11 @@ public class NotesDbTest extends AndroidTestCase {
         Cursor notes = db.getAllNotes();
         assertEquals(1, notes.getCount());
     }
+
+    public void testNotesAreCountedCorrectly() {
+        db.createNote("hello",
+                      Arrays.asList(new String[] {"foo", "bar"}));
+        db.createNote("bye", Arrays.asList(new String[] {"apa"}));
+        assertEquals(2, db.countAllNotes());
+    }
 }

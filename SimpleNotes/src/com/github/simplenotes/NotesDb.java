@@ -262,6 +262,17 @@ public class NotesDb {
         return noteFrom(cursor);
     }
 
+    public int countAllNotes() {
+        Cursor cursor = 
+            mDb.rawQuery("select count(*) from " + DATABASE_TABLE_NOTES, null);
+        try {
+            cursor.moveToFirst();
+            return cursor.getInt(0);
+        } finally {
+            cursor.close();
+        }
+    }
+
     private static final String QUERY_GET_ALL_NOTES =
         "select " +
         DATABASE_TABLE_NOTES + "." + KEY_ROWID + " as id, " +
