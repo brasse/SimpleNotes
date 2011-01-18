@@ -133,4 +133,20 @@ public class NotesDbTest extends AndroidTestCase {
         assertTrue(notes.isAfterLast());
     }
 
+    public void testDeletingAllNotesWorks() {
+        db.createNote("hello", Arrays.asList(new String[] {"foo", "bar"}));
+        db.createNote("bye", Arrays.asList(new String[] {"apa"}));
+        db.deleteAllNotes();
+        Cursor notes = db.getAllNotes();
+        assertEquals(0, notes.getCount());
+    }
+
+    public void testDeletingOneNoteWorks() {
+        long id = db.createNote("hello",
+                                Arrays.asList(new String[] {"foo", "bar"}));
+        db.createNote("bye", Arrays.asList(new String[] {"apa"}));
+        db.deleteNote(id);
+        Cursor notes = db.getAllNotes();
+        assertEquals(1, notes.getCount());
+    }
 }
