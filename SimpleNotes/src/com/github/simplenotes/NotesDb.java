@@ -130,6 +130,17 @@ public class NotesDb {
         }
     }
 
+    public void deleteNote(long id) {
+        mDb.beginTransaction();
+        try {
+            mDb.delete(DATABASE_TABLE_TAGS, KEY_NOTEID + "=" + id, null);
+            mDb.delete(DATABASE_TABLE_NOTES, KEY_ROWID + "=" + id, null);
+            mDb.setTransactionSuccessful();
+        } finally {
+            mDb.endTransaction();
+        }
+    }
+
     public void deleteAllNotes() {
         mDb.beginTransaction();
         try {
