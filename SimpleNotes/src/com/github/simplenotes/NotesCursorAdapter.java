@@ -1,25 +1,24 @@
 package com.github.simplenotes;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.view.LayoutInflater;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-public class MyAdapter implements ListAdapter {
+public class NotesCursorAdapter implements ListAdapter {
 
     Context ctx;
-    String[] data;
+    Cursor notes;
+    int count;
     
-    public MyAdapter(Context ctx) {
+    public NotesCursorAdapter(Context ctx, Cursor notes, int count) {
         this.ctx = ctx;
-        data = new String[3];
-        data[0] = "foo";
-        data[1] = "bar";
-        data[2] = "baz";
+        this.notes = notes;
+        this.count = count;
     }
 
     @Override
@@ -34,12 +33,13 @@ public class MyAdapter implements ListAdapter {
 
     @Override
     public int getCount() {
-        return data.length;
+        return count;
     }
 
     @Override
     public Object getItem(int position) {
-        return data[position];
+        // try to leave unimplemented
+        return null;
     }
 
     @Override
@@ -54,10 +54,11 @@ public class MyAdapter implements ListAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Log.e("FOO", "getView!!!");
+        // check cache
+        // return from cache or create new object
         LayoutInflater inflater = LayoutInflater.from(ctx);
         TextView view = (TextView)inflater.inflate(R.layout.notes_row, parent);
-        view.setText(data[position]);
+        view.setText("x");
         return view;
     }
 
@@ -73,19 +74,17 @@ public class MyAdapter implements ListAdapter {
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return count == 0;
     }
 
     @Override
     public void registerDataSetObserver(DataSetObserver observer) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void unregisterDataSetObserver(DataSetObserver observer) {
         // TODO Auto-generated method stub
-
     }
 
 }
