@@ -6,6 +6,7 @@ import java.util.List;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.DataSetObserver;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,8 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 
 public class NotesCursorAdapter implements ListAdapter {
+
+    private static final String TAG = "NotesCursorAdapter";
 
     Context ctx;
     Cursor cursor;
@@ -43,6 +46,7 @@ public class NotesCursorAdapter implements ListAdapter {
 
     @Override
     public Note getItem(int position) {
+        Log.i(TAG, "getItem(" + position + ")");
         if (position < notes.size()) {
             return notes.get(position);
         }
@@ -68,11 +72,11 @@ public class NotesCursorAdapter implements ListAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        // check cache
-        // return from cache or create new object
+        Log.i(TAG, "getView(" + position + ", ...)");
+        Note note = getItem(position);
         LayoutInflater inflater = LayoutInflater.from(ctx);
-        TextView view = (TextView)inflater.inflate(R.layout.notes_row, parent);
-        view.setText("x");
+        TextView view = (TextView)inflater.inflate(R.layout.notes_row, null);
+        view.setText(note.getContent());
         return view;
     }
 

@@ -2,6 +2,7 @@ package com.github.simplenotes;
 
 import android.app.ListActivity;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,6 +21,15 @@ public class SimpleNotes extends ListActivity {
         setContentView(R.layout.notelist);
         mNotesDb = new NotesDb(this);
         mNotesDb.open();
+
+        // Fill list view with content.
+        int numberOfNotes = mNotesDb.countAllNotes();
+        Cursor cursor = mNotesDb.getAllNotes();
+        startManagingCursor(cursor);
+        cursor.moveToFirst();
+        NotesCursorAdapter adapter = 
+            new NotesCursorAdapter(this, cursor, numberOfNotes);
+        setListAdapter(adapter);
     }
 
     @Override
