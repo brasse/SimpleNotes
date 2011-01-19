@@ -75,7 +75,7 @@ public class NotesCursorAdapter implements ListAdapter {
         Log.i(TAG, "getView(" + position + ", ...)");
         Note note = getItem(position);
         LayoutInflater inflater = LayoutInflater.from(ctx);
-        TextView view = (TextView)inflater.inflate(R.layout.notes_row, null);
+        TextView view = (TextView)inflater.inflate(R.layout.notes_row, parent, false);
         view.setText(note.getContent());
         return view;
     }
