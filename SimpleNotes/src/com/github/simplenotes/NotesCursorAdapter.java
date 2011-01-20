@@ -1,6 +1,7 @@
 package com.github.simplenotes;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import android.content.Context;
@@ -73,10 +74,22 @@ public class NotesCursorAdapter implements ListAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         Log.i(TAG, "getView(" + position + ", ...)");
+        // Show contents, or at least start of content.
         Note note = getItem(position);
         LayoutInflater inflater = LayoutInflater.from(ctx);
-        TextView view = (TextView)inflater.inflate(R.layout.notes_row, parent, false);
-        view.setText(note.getContent());
+        View view = inflater.inflate(R.layout.notes_row, parent, false);
+        TextView content = (TextView)view.findViewById(R.id.content);
+        content.setText(note.getContent());
+
+        // Create the tag row.
+        ViewGroup layout = (ViewGroup)view.findViewById(R.id.tags);
+        Iterator<String> i = note.getTags().iterator();
+        while (i.hasNext()) {
+            TextView tag = 
+                (TextView)inflater.inflate(R.layout.tag, layout, false);
+            tag.setText(i.next());
+            layout.addView(tag);
+        }
         return view;
     }
 
