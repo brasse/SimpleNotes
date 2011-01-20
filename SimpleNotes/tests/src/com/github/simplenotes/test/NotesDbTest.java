@@ -6,6 +6,7 @@ import java.util.List;
 
 import android.database.Cursor;
 import android.test.AndroidTestCase;
+import android.test.RenamingDelegatingContext;
 
 import com.github.simplenotes.Note;
 import com.github.simplenotes.NotesDb;
@@ -15,7 +16,9 @@ public class NotesDbTest extends AndroidTestCase {
     private NotesDb db;
 
     public void setUp() {
-        db = new NotesDb(getContext());
+        RenamingDelegatingContext ctx = 
+            new RenamingDelegatingContext(getContext(), "dbtest_");
+        db = new NotesDb(ctx);
         db.open();
         db.deleteAllNotes();
     }
