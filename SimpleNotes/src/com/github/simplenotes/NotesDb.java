@@ -262,9 +262,13 @@ public class NotesDb {
         return noteFrom(cursor);
     }
 
+    public Cursor countAllNotesCursor() {
+        return mDb.rawQuery("select count(*) from " + DATABASE_TABLE_NOTES, 
+                            null);
+    }
+
     public int countAllNotes() {
-        Cursor cursor = 
-            mDb.rawQuery("select count(*) from " + DATABASE_TABLE_NOTES, null);
+        Cursor cursor = countAllNotesCursor();
         try {
             cursor.moveToFirst();
             return cursor.getInt(0);
