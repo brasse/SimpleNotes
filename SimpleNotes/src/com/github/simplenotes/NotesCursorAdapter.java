@@ -6,15 +6,14 @@ import java.util.List;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DataSetObserver;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListAdapter;
+import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-public class NotesCursorAdapter implements ListAdapter {
+public class NotesCursorAdapter extends BaseAdapter {
 
     private static final String TAG = "NotesCursorAdapter";
 
@@ -28,16 +27,6 @@ public class NotesCursorAdapter implements ListAdapter {
         this.cursor = notes;
         this.count = count;
         this.notes = new ArrayList<Note>();
-    }
-
-    @Override
-    public boolean areAllItemsEnabled() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled(int position) {
-        return true;
     }
 
     @Override
@@ -68,7 +57,7 @@ public class NotesCursorAdapter implements ListAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        return 0;
+        return IGNORE_ITEM_VIEW_TYPE;
     }
 
     @Override
@@ -94,28 +83,7 @@ public class NotesCursorAdapter implements ListAdapter {
     }
 
     @Override
-    public int getViewTypeCount() {
-        return 1;
-    }
-
-    @Override
     public boolean hasStableIds() {
         return true;
     }
-
-    @Override
-    public boolean isEmpty() {
-        return count == 0;
-    }
-
-    @Override
-    public void registerDataSetObserver(DataSetObserver observer) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void unregisterDataSetObserver(DataSetObserver observer) {
-        // TODO Auto-generated method stub
-    }
-
 }
