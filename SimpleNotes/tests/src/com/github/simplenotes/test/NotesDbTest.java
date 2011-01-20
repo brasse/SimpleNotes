@@ -126,11 +126,11 @@ public class NotesDbTest extends AndroidTestCase {
         Cursor notes = db.getAllNotes();
         notes.moveToFirst();
         assertTrue(notes.isFirst());
-        Note note = db.noteFrom(notes);
+        Note note = NotesDb.noteFrom(notes);
         assertEquals(id1, note.getId());
         assertEqualNotes(note1, note);
         assertFalse(notes.isAfterLast());
-        note = db.noteFrom(notes);
+        note = NotesDb.noteFrom(notes);
         assertEquals(id0, note.getId());
         assertEqualNotes(note0, note);
         assertTrue(notes.isAfterLast());
