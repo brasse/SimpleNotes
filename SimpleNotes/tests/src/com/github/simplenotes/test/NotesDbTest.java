@@ -32,6 +32,7 @@ public class NotesDbTest extends AndroidTestCase {
         long id = db.createNote(content, null);
         assertTrue("Note creation failed.", id != -1);
         Note note = db.getNote(id);
+        assertNotNull(note);
         assertEquals(id, note.getId());
         assertEquals(content, note.getContent());
         assertEquals(0, note.getTags().size());
@@ -43,6 +44,7 @@ public class NotesDbTest extends AndroidTestCase {
         long id = db.createNote(content, tags);
         assertTrue("Note creation failed.", id != -1);
         Note note = db.getNote(id);
+        assertNotNull(note);
         assertEquals(id, note.getId());
         assertEquals(content, note.getContent());
         List<String> noteTags = note.getTags();
@@ -86,6 +88,7 @@ public class NotesDbTest extends AndroidTestCase {
         long id = db.createNote(note0);
         assertTrue("Note creation failed.", id != -1);
         Note note1 = db.getNote(id);
+        assertNotNull(note1);
         assertEquals(id, note1.getId());
         assertEqualNotes(note0, note1);
     }

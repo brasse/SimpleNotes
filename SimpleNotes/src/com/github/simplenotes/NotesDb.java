@@ -31,17 +31,20 @@ public class NotesDb {
     public static final String KEY_PINNED = "pinned";
     public static final String KEY_UNREAD = "unread";
 
-    public static final String KEY_NOTEID = "noteid";
     public static final String KEY_NAME = "name";
-    public static final String KEY_POS = "pos";
+
+    public static final String KEY_NOTEID = "noteid";
+    public static final String KEY_TAGID = "tagid";
+    public static final String KEY_IDX = "idx";
 
     private static final String DATABASE_NAME = "notes.db";
-    private static final String DATABASE_TABLE_NOTES = "notes";
-    private static final String DATABASE_TABLE_TAGS = "tags";
+    private static final String DATABASE_TABLE_NOTE = "note";
+    private static final String DATABASE_TABLE_TAG = "tag";
+    private static final String DATABASE_TABLE_RELATION = "relation";
     private static final int DATABASE_VERSION = 1;
 
-    private static final String DATABASE_CREATE_NOTES =
-        "create table " + DATABASE_TABLE_NOTES + " (" +
+    private static final String DATABASE_CREATE_NOTE =
+        "create table " + DATABASE_TABLE_NOTE + " (" +
         KEY_ROWID + " integer primary key autoincrement, " +
         KEY_KEY + " text, " + 
         KEY_CONTENT + " text not null, " +
@@ -56,16 +59,19 @@ public class NotesDb {
         KEY_PINNED + " integer not null default 0, " +
         KEY_UNREAD + " integer not null default 0);";
 
-    private static final String DATABASE_CREATE_TAGS =
-        "create table " + DATABASE_TABLE_TAGS + " (" +
+    private static final String DATABASE_CREATE_TAG =
+        "create table " + DATABASE_TABLE_TAG + " (" +
         KEY_ROWID + " integer primary key autoincrement, " +
-        KEY_NAME + " text not null, " + 
-        KEY_POS + " integer not null, " + 
-        KEY_NOTEID + " integer not null, " +
-        "foreign key(" + KEY_NOTEID + 
-        ") references " + DATABASE_TABLE_NOTES + " (" + KEY_ROWID + "));";
+        KEY_NAME + " text not null);";
 
-    private static final String TAG = "NotesDb";
+    private static final String DATABASE_CREATE_RELATION =
+        "create table " + DATABASE_TABLE_RELATION + " (" +
+        KEY_ROWID + " integer primary key autoincrement, " +
+        KEY_NOTEID + " integer not null, " +
+        KEY_TAGID + " integer not null, " +
+        KEY_IDX + " integer not null);";
+
+    private static final String TAG = "simplenotes.NotesDb";
 
     private final Context mCtx;
 
@@ -81,8 +87,9 @@ public class NotesDb {
         @Override
         public void onCreate(SQLiteDatabase db) {
             Log.i(TAG, "Creating database.");
-            db.execSQL(DATABASE_CREATE_NOTES);
-            db.execSQL(DATABASE_CREATE_TAGS);
+            db.execSQL(DATABASE_CREATE_NOTE);
+            db.execSQL(DATABASE_CREATE_TAG);
+            db.execSQL(DATABASE_CREATE_RELATION);
         }
 
         @Override
@@ -116,25 +123,38 @@ public class NotesDb {
     }
 
     private void addTags(long noteId, List<String> tags) {
-        if (tags != null) {
-            ListIterator<String> i = tags.listIterator();
-            while (i.hasNext()) {
-                int index = i.nextIndex();
-                String tag = i.next();
-                ContentValues tagValues = new ContentValues();
-                tagValues.put(KEY_NAME, tag);
-                tagValues.put(KEY_POS, index);
-                tagValues.put(KEY_NOTEID, noteId);
-                mDb.insertOrThrow(DATABASE_TABLE_TAGS, null, tagValues);
+        if (tags == null) {
+            return;
+        }
+        ListIterator<String> i = tags.listIterator();
+        while (i.hasNext()) {
+            int index = i.nextIndex();
+            String tagName = i.next();
+            Cursor c = mDb.query(DATABASE_TABLE_TAG,
+                                 new String[] {KEY_ROWID},
+                                 KEY_NAME + "= ?", new String[] {tagName},
+                                 null, null, null, null);
+            long tagId;
+            if (c.moveToFirst()) {
+                tagId = c.getLong(0);
+            } else {
+                ContentValues values = new ContentValues();
+                values.put(KEY_NAME, tagName);
+                tagId = mDb.insertOrThrow(DATABASE_TABLE_TAG, null, values);
             }
+            ContentValues relationValues = new ContentValues();
+            relationValues.put(KEY_NOTEID, noteId);
+            relationValues.put(KEY_TAGID, tagId);
+            relationValues.put(KEY_IDX, index);
+            mDb.insertOrThrow(DATABASE_TABLE_RELATION, null, relationValues);
         }
     }
 
     public void deleteNote(long id) {
         mDb.beginTransaction();
         try {
-            mDb.delete(DATABASE_TABLE_TAGS, KEY_NOTEID + "=" + id, null);
-            mDb.delete(DATABASE_TABLE_NOTES, KEY_ROWID + "=" + id, null);
+            mDb.delete(DATABASE_TABLE_RELATION, KEY_NOTEID + "=" + id, null);
+            mDb.delete(DATABASE_TABLE_NOTE, KEY_ROWID + "=" + id, null);
             mDb.setTransactionSuccessful();
         } finally {
             mDb.endTransaction();
@@ -144,8 +164,8 @@ public class NotesDb {
     public void deleteAllNotes() {
         mDb.beginTransaction();
         try {
-            mDb.delete(DATABASE_TABLE_TAGS, null, null);
-            mDb.delete(DATABASE_TABLE_NOTES, null, null);
+            mDb.delete(DATABASE_TABLE_TAG, null, null);
+            mDb.delete(DATABASE_TABLE_NOTE, null, null);
             mDb.setTransactionSuccessful();
         } finally {
             mDb.endTransaction();
@@ -159,7 +179,7 @@ public class NotesDb {
             ContentValues noteValues = new ContentValues();
             noteValues.put(KEY_CONTENT, content);
             long noteId = 
-                mDb.insertOrThrow(DATABASE_TABLE_NOTES, null, noteValues); 
+                mDb.insertOrThrow(DATABASE_TABLE_NOTE, null, noteValues); 
             addTags(noteId, tags);
             mDb.setTransactionSuccessful();
             return noteId;
@@ -186,7 +206,7 @@ public class NotesDb {
             noteValues.put(KEY_PINNED, note.isPinned());
             noteValues.put(KEY_UNREAD, note.isUnread());
             long noteId = 
-                mDb.insertOrThrow(DATABASE_TABLE_NOTES, null, noteValues); 
+                mDb.insertOrThrow(DATABASE_TABLE_NOTE, null, noteValues); 
             addTags(noteId, note.getTags());
             mDb.setTransactionSuccessful();
             return noteId;
@@ -234,25 +254,33 @@ public class NotesDb {
 
     private static final String QUERY_GET_NOTE =
         "select " +
-        DATABASE_TABLE_NOTES + "." + KEY_ROWID + " as id, " +
-        DATABASE_TABLE_NOTES + "." + KEY_KEY + ", " +
-        DATABASE_TABLE_NOTES + "." + KEY_DELETED + ", " +
-        DATABASE_TABLE_NOTES + "." + KEY_MODIFYDATE + ", " +
-        DATABASE_TABLE_NOTES + "." + KEY_CREATEDATE + ", " +
-        DATABASE_TABLE_NOTES + "." + KEY_SYNCNUM + ", " +
-        DATABASE_TABLE_NOTES + "." + KEY_VERSION + ", " +
-        DATABASE_TABLE_NOTES + "." + KEY_MINVERSION + ", " +
-        DATABASE_TABLE_NOTES + "." + KEY_SHAREKEY + ", " +
-        DATABASE_TABLE_NOTES + "." + KEY_PUBLISHKEY + ", " +
-        DATABASE_TABLE_NOTES + "." + KEY_CONTENT + ", " +
-        DATABASE_TABLE_NOTES + "." + KEY_PINNED + ", " +
-        DATABASE_TABLE_NOTES + "." + KEY_UNREAD + ", " +
-        DATABASE_TABLE_TAGS + "." + KEY_NAME +
-        " from " + DATABASE_TABLE_NOTES + " left join " + DATABASE_TABLE_TAGS +
-        " on id = " + DATABASE_TABLE_TAGS + "." + KEY_NOTEID + " " +
-        "where id = ? order by " + DATABASE_TABLE_TAGS + "." + KEY_POS + ";";
+        DATABASE_TABLE_NOTE + "." + KEY_ROWID + " as noteid, " +
+        DATABASE_TABLE_NOTE + "." + KEY_KEY + ", " +
+        DATABASE_TABLE_NOTE + "." + KEY_DELETED + ", " +
+        DATABASE_TABLE_NOTE + "." + KEY_MODIFYDATE + ", " +
+        DATABASE_TABLE_NOTE + "." + KEY_CREATEDATE + ", " +
+        DATABASE_TABLE_NOTE + "." + KEY_SYNCNUM + ", " +
+        DATABASE_TABLE_NOTE + "." + KEY_VERSION + ", " +
+        DATABASE_TABLE_NOTE + "." + KEY_MINVERSION + ", " +
+        DATABASE_TABLE_NOTE + "." + KEY_SHAREKEY + ", " +
+        DATABASE_TABLE_NOTE + "." + KEY_PUBLISHKEY + ", " +
+        DATABASE_TABLE_NOTE + "." + KEY_CONTENT + ", " +
+        DATABASE_TABLE_NOTE + "." + KEY_PINNED + " as pinned, "+
+        DATABASE_TABLE_NOTE + "." + KEY_UNREAD + ", " +
+        DATABASE_TABLE_TAG + "." + KEY_NAME + ", " +
+        DATABASE_TABLE_RELATION + "." + KEY_IDX + " as tagidx " +
+        " from " + DATABASE_TABLE_NOTE + 
+        " left join " + DATABASE_TABLE_RELATION +
+        " on (" + DATABASE_TABLE_RELATION + "." + KEY_NOTEID + " = " +
+        DATABASE_TABLE_NOTE + "." + KEY_ROWID + ") " +
+        " left join " + DATABASE_TABLE_TAG +
+        " on (" + DATABASE_TABLE_TAG + "." + KEY_ROWID + " = " +
+        DATABASE_TABLE_RELATION + "." + KEY_TAGID +
+        ") where " + DATABASE_TABLE_NOTE + "." + KEY_ROWID + " = ? " +
+        "order by noteid, tagidx;";
 
     public Note getNote(long id) {
+        Log.i(TAG, QUERY_GET_NOTE);
         Cursor cursor =
             mDb.rawQuery(QUERY_GET_NOTE, new String[] {String.valueOf(id)});
         if (!cursor.moveToFirst()) {
@@ -263,7 +291,7 @@ public class NotesDb {
     }
 
     public Cursor countAllNotesCursor() {
-        return mDb.rawQuery("select count(*) from " + DATABASE_TABLE_NOTES, 
+        return mDb.rawQuery("select count(*) from " + DATABASE_TABLE_NOTE, 
                             null);
     }
 
@@ -279,24 +307,29 @@ public class NotesDb {
 
     private static final String QUERY_GET_ALL_NOTES =
         "select " +
-        DATABASE_TABLE_NOTES + "." + KEY_ROWID + " as id, " +
-        DATABASE_TABLE_NOTES + "." + KEY_KEY + ", " +
-        DATABASE_TABLE_NOTES + "." + KEY_DELETED + ", " +
-        DATABASE_TABLE_NOTES + "." + KEY_MODIFYDATE + ", " +
-        DATABASE_TABLE_NOTES + "." + KEY_CREATEDATE + ", " +
-        DATABASE_TABLE_NOTES + "." + KEY_SYNCNUM + ", " +
-        DATABASE_TABLE_NOTES + "." + KEY_VERSION + ", " +
-        DATABASE_TABLE_NOTES + "." + KEY_MINVERSION + ", " +
-        DATABASE_TABLE_NOTES + "." + KEY_SHAREKEY + ", " +
-        DATABASE_TABLE_NOTES + "." + KEY_PUBLISHKEY + ", " +
-        DATABASE_TABLE_NOTES + "." + KEY_CONTENT + ", " +
-        DATABASE_TABLE_NOTES + "." + KEY_PINNED + ", " +
-        DATABASE_TABLE_NOTES + "." + KEY_UNREAD + ", " +
-        DATABASE_TABLE_TAGS + "." + KEY_NAME +
-        " from " + DATABASE_TABLE_NOTES + " left join " + DATABASE_TABLE_TAGS +
-        " on id = " + DATABASE_TABLE_TAGS + "." + KEY_NOTEID + " " +
-        "order by " + DATABASE_TABLE_NOTES + "." + KEY_PINNED + " desc, id," + 
-        DATABASE_TABLE_TAGS + "." + KEY_POS + ";";
+        DATABASE_TABLE_NOTE + "." + KEY_ROWID + " as noteid, " +
+        DATABASE_TABLE_NOTE + "." + KEY_KEY + ", " +
+        DATABASE_TABLE_NOTE + "." + KEY_DELETED + ", " +
+        DATABASE_TABLE_NOTE + "." + KEY_MODIFYDATE + ", " +
+        DATABASE_TABLE_NOTE + "." + KEY_CREATEDATE + ", " +
+        DATABASE_TABLE_NOTE + "." + KEY_SYNCNUM + ", " +
+        DATABASE_TABLE_NOTE + "." + KEY_VERSION + ", " +
+        DATABASE_TABLE_NOTE + "." + KEY_MINVERSION + ", " +
+        DATABASE_TABLE_NOTE + "." + KEY_SHAREKEY + ", " +
+        DATABASE_TABLE_NOTE + "." + KEY_PUBLISHKEY + ", " +
+        DATABASE_TABLE_NOTE + "." + KEY_CONTENT + ", " +
+        DATABASE_TABLE_NOTE + "." + KEY_PINNED + " as pinned, "+
+        DATABASE_TABLE_NOTE + "." + KEY_UNREAD + ", " +
+        DATABASE_TABLE_TAG + "." + KEY_NAME + ", " +
+        DATABASE_TABLE_RELATION + "." + KEY_IDX + " as tagidx " +
+        " from " + DATABASE_TABLE_NOTE + 
+        " left join " + DATABASE_TABLE_RELATION +
+        " on (" + DATABASE_TABLE_RELATION + "." + KEY_NOTEID + " = " +
+        DATABASE_TABLE_NOTE + "." + KEY_ROWID + ") " +
+        " left join " + DATABASE_TABLE_TAG +
+        " on (" + DATABASE_TABLE_TAG + "." + KEY_ROWID + " = " +
+        DATABASE_TABLE_RELATION + "." + KEY_TAGID +
+        ") order by pinned desc, noteid, tagidx;";
 
     public Cursor getAllNotes() {
         return mDb.rawQuery(QUERY_GET_ALL_NOTES, null);
