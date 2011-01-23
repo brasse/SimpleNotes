@@ -1,5 +1,6 @@
 package com.github.simplenotes.test;
 
+import android.database.DataSetObserver;
 import android.test.AndroidTestCase;
 import android.test.mock.MockContext;
 import android.util.Log;
@@ -14,8 +15,14 @@ public class NotesCursorAdapterTest extends AndroidTestCase {
         Object[][] rows;
 
         public TestCursor(Object[][] rows) {
-            this.position = 0;
+            this.position = -1;
             this.rows = rows;
+        }
+
+        @Override
+        public boolean moveToFirst() {
+            ++position;
+            return true;
         }
 
         @Override
@@ -46,22 +53,29 @@ public class NotesCursorAdapterTest extends AndroidTestCase {
             position++;
             return true;
         }
+
+        @Override
+        public void registerDataSetObserver(DataSetObserver observer) {
+        }
     }
 
     public void testHandlesNotesWithoutTagsCorrectly() {
-        Object[][] rows = { 
+        Object[][] noteRows = { 
             new Object[] {0L, "k0", 0, 10L, 20L, 1, 3, 2, "sk", "pk", 
                           "c0", 0, 0, null},
             new Object[] {1L, "k1", 0, 10L, 20L, 1, 3, 2, "sk", "pk", 
                           "c1", 0, 0, null},
         };
-        TestCursor cursor = new TestCursor(rows);
+        TestCursor cursor = new TestCursor(noteRows);
+        Object[][] countRow = {new Object[] {2}};
+        TestCursor countCursor = new TestCursor(countRow);
+
         NotesCursorAdapter adapter = 
-            new NotesCursorAdapter(new MockContext(), cursor, rows.length);
+            new NotesCursorAdapter(new MockContext(), cursor, countCursor);
         Note n = adapter.getItem(1);
-        assertEquals(rows[1][0], n.getId());
+        assertEquals(noteRows[1][0], n.getId());
         n = adapter.getItem(0);
-        assertEquals(rows[0][0], n.getId());
+        assertEquals(noteRows[0][0], n.getId());
     }
 
 }
