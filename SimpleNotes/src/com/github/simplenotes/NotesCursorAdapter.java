@@ -6,6 +6,7 @@ import java.util.List;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DataSetObserver;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,18 +16,82 @@ import android.widget.TextView;
 
 public class NotesCursorAdapter extends BaseAdapter {
 
-    private static final String TAG = "NotesCursorAdapter";
+    private static final String TAG = "simplenotes.NotesCursorAdapter";
 
-    Context ctx;
-    Cursor cursor;
-    int count;
-    List<Note> notes;
-    
-    public NotesCursorAdapter(Context ctx, Cursor notes, int count) {
+    class Observer extends DataSetObserver {
+        boolean observingNotes;
+
+        public Observer(boolean observingNotes) {
+            this.observingNotes = observingNotes;
+        }
+
+        @Override
+        public void onChanged() {
+            Log.i(TAG, "Observer.onChange()");
+            if (observingNotes) {
+                notesUpdated = true;
+            } else {
+                countUpdated = true;
+            }
+            startOver();
+        }
+
+        @Override
+        public void onInvalidated() {
+            Log.i(TAG, "Observer.onInvalidated()");
+            invalidate();
+        }
+    }
+
+    private Context ctx;
+    private boolean notesUpdated;
+    private Cursor notesCursor;
+    private boolean countUpdated;
+    private Cursor countCursor;
+    private int count;
+    private List<Note> notes;
+    private boolean invalidated;
+
+    public NotesCursorAdapter(Context ctx,
+                              Cursor notesCursor, Cursor countCursor) {
         this.ctx = ctx;
-        this.cursor = notes;
-        this.count = count;
+        this.notesCursor = notesCursor;
+        this.notesUpdated = false;
+        this.notesCursor.registerDataSetObserver(new Observer(true));
+        this.countCursor = countCursor;
+        this.countUpdated = false;
+        this.countCursor.registerDataSetObserver(new Observer(false));
+        this.count = 0;
         this.notes = new ArrayList<Note>();
+        this.invalidated = true;
+        initializeCursors();
+    }
+
+    private void startOver() {
+        if (notesUpdated && countUpdated) {
+            Log.i(TAG, "Both cursors updated.");
+            notifyDataSetChanged();
+            notesUpdated = false;
+            countUpdated = false;
+            initializeCursors();
+            notifyDataSetChanged();
+        }
+    }
+
+    private void invalidate() {
+        if (!invalidated) {
+            Log.i(TAG, "notify invalidated.");
+            notifyDataSetInvalidated();
+            invalidated = true;
+        }
+    }
+
+    private void initializeCursors() {
+        notes.clear();
+        notesCursor.moveToFirst();
+        countCursor.moveToFirst();
+        count = countCursor.getInt(0);
+        invalidated = false;
     }
 
     @Override
@@ -43,7 +108,7 @@ public class NotesCursorAdapter extends BaseAdapter {
 
         int cursorPosition = notes.size();
         while (cursorPosition <= position) {
-            Note note = NotesDb.noteFrom(cursor);
+            Note note = NotesDb.noteFrom(notesCursor);
             notes.add(note);
             ++cursorPosition;
         }

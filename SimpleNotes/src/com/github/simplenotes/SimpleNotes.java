@@ -23,12 +23,12 @@ public class SimpleNotes extends ListActivity {
         mNotesDb.open();
 
         // Fill list view with content.
-        int numberOfNotes = mNotesDb.countAllNotes();
-        Cursor cursor = mNotesDb.getAllNotes();
-        startManagingCursor(cursor);
-        cursor.moveToFirst();
+        Cursor countCursor = mNotesDb.countAllNotesCursor();
+        startManagingCursor(countCursor);
+        Cursor notesCursor = mNotesDb.getAllNotes();
+        startManagingCursor(notesCursor);
         NotesCursorAdapter adapter = 
-            new NotesCursorAdapter(this, cursor, numberOfNotes);
+            new NotesCursorAdapter(this, notesCursor, countCursor);
         setListAdapter(adapter);
     }
 
