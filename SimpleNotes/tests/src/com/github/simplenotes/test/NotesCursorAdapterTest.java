@@ -3,7 +3,6 @@ package com.github.simplenotes.test;
 import android.database.DataSetObserver;
 import android.test.AndroidTestCase;
 import android.test.mock.MockContext;
-import android.util.Log;
 
 import com.github.simplenotes.Note;
 import com.github.simplenotes.NotesCursorAdapter;
@@ -32,9 +31,6 @@ public class NotesCursorAdapterTest extends AndroidTestCase {
 
         @Override
         public long getLong(int columnIndex) {
-            Log.i("TEST", "A " + rows.length);
-            Log.i("TEST", "B " + rows[0].length);
-            Log.i("TEST", "C " + position + " " + columnIndex);
             return (Long)rows[position][columnIndex];
         }
 
