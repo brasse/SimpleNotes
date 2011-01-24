@@ -6,8 +6,12 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ListView;
 
 public class SimpleNotes extends ListActivity {
+    private static final int ACTIVITY_CREATE = 0;
+    private static final int ACTIVITY_EDIT = 1;
 
     public static final int ADD_NOTE_ID = Menu.FIRST;
     public static final int SETTINGS_ID = Menu.FIRST + 1;
@@ -44,13 +48,26 @@ public class SimpleNotes extends ListActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case ADD_NOTE_ID:
-            startActivity(new Intent(this, EditNote.class));
+            createNote();
             return true;
         case SETTINGS_ID:
             startActivity(new Intent(this, EditPreferences.class));
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void createNote() {
+        Intent i = new Intent(this, EditNote.class);
+        startActivityForResult(i, ACTIVITY_CREATE);
+    }
+
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+        Intent i = new Intent(this, EditNote.class);
+        i.putExtra(NotesDb.KEY_ROWID, id);
+        startActivityForResult(i, ACTIVITY_EDIT);
     }
 
 }
