@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 public class Note {
-    private long id;
+    private Long id;
     private String key;
     private boolean deleted;
     private Date modifyDate;
@@ -25,10 +25,10 @@ public class Note {
         tags = new ArrayList<String>();
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
     public String getKey() {

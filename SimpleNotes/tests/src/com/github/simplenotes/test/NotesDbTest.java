@@ -29,7 +29,7 @@ public class NotesDbTest extends AndroidTestCase {
 
     public void testCanCreateNoteWithoutTagsAndReadIt() {
         String content = "foo bar baz";
-        long id = db.createNote(content, null);
+        Long id = db.createNote(content, null);
         assertTrue("Note creation failed.", id != -1);
         Note note = db.getNote(id);
         assertNotNull(note);
@@ -41,7 +41,7 @@ public class NotesDbTest extends AndroidTestCase {
     public void testCanCreateNoteWithTagsAndReadIt() {
         String content = "foo bar baz";
         List<String> tags = Arrays.asList(new String[] {"foo", "bar"});
-        long id = db.createNote(content, tags);
+        Long id = db.createNote(content, tags);
         assertTrue("Note creation failed.", id != -1);
         Note note = db.getNote(id);
         assertNotNull(note);
@@ -85,7 +85,7 @@ public class NotesDbTest extends AndroidTestCase {
         note0.setMinVersion(20);
         note0.setShareKey("sharekey");
         note0.setPublishKey("publishkey");
-        long id = db.createNote(note0);
+        Long id = db.createNote(note0);
         assertTrue("Note creation failed.", id != -1);
         assertEquals(id, note0.getId());
         Note note1 = db.getNote(id);
@@ -135,7 +135,7 @@ public class NotesDbTest extends AndroidTestCase {
         note0.setMinVersion(15);
         note0.setShareKey("sharekey");
         note0.setPublishKey("publishkey");
-        long id0 = db.createNote(note0);
+        Long id0 = db.createNote(note0);
         assertTrue("Note creation failed.", id0 != -1);
 
         Note note1 = new Note();
@@ -151,7 +151,7 @@ public class NotesDbTest extends AndroidTestCase {
         note1.setMinVersion(15);
         note1.setShareKey("sharekey2");
         note1.setPublishKey("publishkey2");
-        long id1 = db.createNote(note1);
+        Long id1 = db.createNote(note1);
         assertTrue("Note creation failed.", id1 != -1);
 
         Cursor notes = db.getAllNotes();
