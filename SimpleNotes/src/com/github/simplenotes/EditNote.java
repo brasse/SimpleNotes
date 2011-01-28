@@ -8,7 +8,7 @@ import android.widget.EditText;
 public class EditNote extends Activity {
 
     private NotesDb notesDb;
-    private Long noteId;
+    private Note note;
     private EditText contentText;
 
     private static final String TAG = "simplenotes.EditNote";
@@ -24,18 +24,19 @@ public class EditNote extends Activity {
 
         Log.i(TAG, "saveInstanceState: " + 
                    (savedInstanceState != null ? "!null" : "null"));
-        noteId = null;
+        note = new Note();
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            noteId = extras.getLong(NotesDb.KEY_ROWID);
+            Long noteId = extras.getLong(NotesDb.KEY_ROWID);
+            note.setId(noteId);
         }
 
         fillContent();
     }
 
     private void fillContent() {
-        if (noteId != null) {
-            Note note = notesDb.getNote(noteId);
+        if (note.getId() != null) {
+            note = notesDb.getNote(note.getId());
             contentText.setText(note.getContent());
         }
     }
@@ -50,12 +51,27 @@ public class EditNote extends Activity {
     protected void onPause() {
         super.onPause();
         Log.i(TAG, "onPause()");
+        saveNote();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         Log.i(TAG, "onResume()");
+        fillContent();
     }
 
+    private void saveNote() {
+        String content = contentText.getText().toString();
+        note.setContent(content);
+        if (note.getId() == null) {
+            long id = notesDb.createNote(note);
+            if (id < 0) {
+                Log.e(TAG, "Failed to create note.");
+            }
+        } else {
+            notesDb.updateNote(note);
+        }
+
+    }
 }
