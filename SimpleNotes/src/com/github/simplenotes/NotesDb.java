@@ -209,6 +209,7 @@ public class NotesDb {
                 mDb.insertOrThrow(DATABASE_TABLE_NOTE, null, noteValues); 
             addTags(noteId, note.getTags());
             mDb.setTransactionSuccessful();
+            note.setId(noteId);
             return noteId;
         } finally {
             mDb.endTransaction();

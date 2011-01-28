@@ -87,6 +87,7 @@ public class NotesDbTest extends AndroidTestCase {
         note0.setPublishKey("publishkey");
         long id = db.createNote(note0);
         assertTrue("Note creation failed.", id != -1);
+        assertEquals(id, note0.getId());
         Note note1 = db.getNote(id);
         assertNotNull(note1);
         assertEquals(id, note1.getId());
