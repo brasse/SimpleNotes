@@ -94,6 +94,33 @@ public class NotesDbTest extends AndroidTestCase {
         assertEqualNotes(note0, note1);
     }
 
+    public void testCanCreateFromNoteObjectAndUpdateItAndReadIt() {
+        Note note0 = new Note();
+        note0.setContent("Creating note from note object.");
+        note0.setKey("key");
+        note0.setTags(Arrays.asList(new String[] {"foo", "bar", "baz"}));
+        note0.setSystemTags(Arrays.asList(new String[] {"pinned", "unread"}));
+        note0.setCreateDate(new Date(1295216117000L));
+        note0.setModifyDate(new Date(1295216118000L));
+        note0.setDeleted(false);
+        note0.setSyncNum(10);
+        note0.setVersion(15);
+        note0.setMinVersion(20);
+        note0.setShareKey("sharekey");
+        note0.setPublishKey("publishkey");
+        long id = db.createNote(note0);
+        assertTrue("Note creation failed.", id != -1);
+
+        note0.setTags(Arrays.asList(new String[] {"x", "y", "z"}));
+        note0.setContent("new content");
+        db.updateNote(note0);
+
+        Note note1 = db.getNote(note0.getId());
+        assertNotNull(note1);
+        assertEquals(note0.getId(), note1.getId());
+        assertEqualNotes(note0, note1);
+    }
+
     public void testReadAllNotesWithGetAllNotes() {
         Note note0 = new Note();
         note0.setContent("Creating note0 from note object.");

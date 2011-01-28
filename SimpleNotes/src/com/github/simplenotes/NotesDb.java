@@ -122,6 +122,10 @@ public class NotesDb {
         mDbHelper.close();
     }
 
+    private void clearTags(long noteId) {
+        mDb.delete(DATABASE_TABLE_RELATION, KEY_NOTEID + "=" + noteId, null);
+    }
+
     private void addTags(long noteId, List<String> tags) {
         if (tags == null) {
             return;
@@ -211,6 +215,35 @@ public class NotesDb {
             mDb.setTransactionSuccessful();
             note.setId(noteId);
             return noteId;
+        } finally {
+            mDb.endTransaction();
+        }
+    }
+
+    public void updateNote(Note note) {
+        mDb.beginTransaction();
+        try {
+            ContentValues noteValues = new ContentValues();
+            noteValues.put(KEY_KEY, note.getKey());
+            noteValues.put(KEY_DELETED, note.isDeleted());
+            noteValues.put(KEY_CREATEDATE, note.getCreateDate().getTime());
+            noteValues.put(KEY_MODIFYDATE, note.getModifyDate().getTime());
+            noteValues.put(KEY_SYNCNUM, note.getSyncNum());
+            noteValues.put(KEY_VERSION, note.getVersion());
+            noteValues.put(KEY_MINVERSION, note.getMinVersion());
+            noteValues.put(KEY_SHAREKEY, note.getShareKey());
+            noteValues.put(KEY_PUBLISHKEY, note.getPublishKey());
+            noteValues.put(KEY_CONTENT, note.getContent());
+            noteValues.put(KEY_PINNED, note.isPinned());
+            noteValues.put(KEY_UNREAD, note.isUnread());
+            int rowsUpdated = mDb.update(DATABASE_TABLE_NOTE, noteValues,
+                                         KEY_ROWID + "=" + note.getId(), null);
+            if (rowsUpdated != 1) {
+                throw new SQLException("Exactly 1 row should be updated.");
+            }
+            clearTags(note.getId());
+            addTags(note.getId(), note.getTags());
+            mDb.setTransactionSuccessful();
         } finally {
             mDb.endTransaction();
         }
