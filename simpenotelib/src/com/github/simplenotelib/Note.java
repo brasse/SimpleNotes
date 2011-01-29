@@ -32,6 +32,9 @@ public class Note {
 	private Collection<String> tags;
 	private String content;
 	public Note() {
+		this.deleted = false;
+		this.modifydate = (System.currentTimeMillis() / 1000L);
+		this.createdate = (System.currentTimeMillis() / 1000L);
 		
 	}
 	public void setKey(String key) {
