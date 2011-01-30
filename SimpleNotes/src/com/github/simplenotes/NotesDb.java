@@ -192,6 +192,23 @@ public class NotesDb {
         }
     }
 
+    private ContentValues makeValues(Note note) {
+        ContentValues noteValues = new ContentValues();
+        noteValues.put(KEY_KEY, note.getKey());
+        noteValues.put(KEY_DELETED, note.isDeleted());
+        noteValues.put(KEY_CREATEDATE, dateToLong(note.getCreateDate()));
+        noteValues.put(KEY_MODIFYDATE, dateToLong(note.getModifyDate()));
+        noteValues.put(KEY_SYNCNUM, note.getSyncNum());
+        noteValues.put(KEY_VERSION, note.getVersion());
+        noteValues.put(KEY_MINVERSION, note.getMinVersion());
+        noteValues.put(KEY_SHAREKEY, note.getShareKey());
+        noteValues.put(KEY_PUBLISHKEY, note.getPublishKey());
+        noteValues.put(KEY_CONTENT, note.getContent());
+        noteValues.put(KEY_PINNED, note.isPinned());
+        noteValues.put(KEY_UNREAD, note.isUnread());
+        return noteValues;
+    }
+
     private Long dateToLong(Date d) {
         return d != null ? d.getTime() : null;
     }
@@ -200,19 +217,7 @@ public class NotesDb {
         mDb.beginTransaction();
         try {
             // Create note.
-            ContentValues noteValues = new ContentValues();
-            noteValues.put(KEY_KEY, note.getKey());
-            noteValues.put(KEY_DELETED, note.isDeleted());
-            noteValues.put(KEY_CREATEDATE, dateToLong(note.getCreateDate()));
-            noteValues.put(KEY_MODIFYDATE, dateToLong(note.getModifyDate()));
-            noteValues.put(KEY_SYNCNUM, note.getSyncNum());
-            noteValues.put(KEY_VERSION, note.getVersion());
-            noteValues.put(KEY_MINVERSION, note.getMinVersion());
-            noteValues.put(KEY_SHAREKEY, note.getShareKey());
-            noteValues.put(KEY_PUBLISHKEY, note.getPublishKey());
-            noteValues.put(KEY_CONTENT, note.getContent());
-            noteValues.put(KEY_PINNED, note.isPinned());
-            noteValues.put(KEY_UNREAD, note.isUnread());
+            ContentValues noteValues = makeValues(note);
             long noteId = 
                 mDb.insertOrThrow(DATABASE_TABLE_NOTE, null, noteValues); 
             addTags(noteId, note.getTags());
@@ -227,19 +232,7 @@ public class NotesDb {
     public void updateNote(Note note) {
         mDb.beginTransaction();
         try {
-            ContentValues noteValues = new ContentValues();
-            noteValues.put(KEY_KEY, note.getKey());
-            noteValues.put(KEY_DELETED, note.isDeleted());
-            noteValues.put(KEY_CREATEDATE, dateToLong(note.getCreateDate()));
-            noteValues.put(KEY_MODIFYDATE, dateToLong(note.getModifyDate()));
-            noteValues.put(KEY_SYNCNUM, note.getSyncNum());
-            noteValues.put(KEY_VERSION, note.getVersion());
-            noteValues.put(KEY_MINVERSION, note.getMinVersion());
-            noteValues.put(KEY_SHAREKEY, note.getShareKey());
-            noteValues.put(KEY_PUBLISHKEY, note.getPublishKey());
-            noteValues.put(KEY_CONTENT, note.getContent());
-            noteValues.put(KEY_PINNED, note.isPinned());
-            noteValues.put(KEY_UNREAD, note.isUnread());
+            ContentValues noteValues = makeValues(note);
             int rowsUpdated = mDb.update(DATABASE_TABLE_NOTE, noteValues,
                                          KEY_ROWID + "=" + note.getId(), null);
             if (rowsUpdated != 1) {
