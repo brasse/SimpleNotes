@@ -192,6 +192,10 @@ public class NotesDb {
         }
     }
 
+    private Long dateToLong(Date d) {
+        return d != null ? d.getTime() : null;
+    }
+
     public long createNote(Note note) {
         mDb.beginTransaction();
         try {
@@ -199,8 +203,8 @@ public class NotesDb {
             ContentValues noteValues = new ContentValues();
             noteValues.put(KEY_KEY, note.getKey());
             noteValues.put(KEY_DELETED, note.isDeleted());
-            noteValues.put(KEY_CREATEDATE, note.getCreateDate().getTime());
-            noteValues.put(KEY_MODIFYDATE, note.getModifyDate().getTime());
+            noteValues.put(KEY_CREATEDATE, dateToLong(note.getCreateDate()));
+            noteValues.put(KEY_MODIFYDATE, dateToLong(note.getModifyDate()));
             noteValues.put(KEY_SYNCNUM, note.getSyncNum());
             noteValues.put(KEY_VERSION, note.getVersion());
             noteValues.put(KEY_MINVERSION, note.getMinVersion());
@@ -226,8 +230,8 @@ public class NotesDb {
             ContentValues noteValues = new ContentValues();
             noteValues.put(KEY_KEY, note.getKey());
             noteValues.put(KEY_DELETED, note.isDeleted());
-            noteValues.put(KEY_CREATEDATE, note.getCreateDate().getTime());
-            noteValues.put(KEY_MODIFYDATE, note.getModifyDate().getTime());
+            noteValues.put(KEY_CREATEDATE, dateToLong(note.getCreateDate()));
+            noteValues.put(KEY_MODIFYDATE, dateToLong(note.getModifyDate()));
             noteValues.put(KEY_SYNCNUM, note.getSyncNum());
             noteValues.put(KEY_VERSION, note.getVersion());
             noteValues.put(KEY_MINVERSION, note.getMinVersion());
@@ -254,8 +258,12 @@ public class NotesDb {
         note.setId(cursor.getLong(0));
         note.setKey(cursor.getString(1));
         note.setDeleted(cursor.getInt(2) != 0);
-        note.setModifyDate(new Date(cursor.getLong(3)));
-        note.setCreateDate(new Date(cursor.getLong(4)));
+        if (!cursor.isNull(3)) {
+            note.setModifyDate(new Date(cursor.getLong(3)));
+        }
+        if (!cursor.isNull(4)) {
+            note.setCreateDate(new Date(cursor.getLong(4)));
+        }
         note.setSyncNum(cursor.getInt(5));
         note.setVersion(cursor.getInt(6));
         note.setMinVersion(cursor.getInt(7));

@@ -71,6 +71,18 @@ public class NotesDbTest extends AndroidTestCase {
         assertEquals(note0.isUnread(), note1.isUnread());
     }
 
+    public void testCanCreateAlmostEmptyNoteFromNoteObjectAndReadIt() {
+        Note note0 = new Note();
+        note0.setContent("Creating note from note object.");
+        Long id = db.createNote(note0);
+        assertTrue("Note creation failed.", id != -1);
+        assertEquals(id, note0.getId());
+        Note note1 = db.getNote(id);
+        assertNotNull(note1);
+        assertEquals(id, note1.getId());
+        assertEqualNotes(note0, note1);
+    }
+
     public void testCanCreateFromNoteObjectAndReadIt() {
         Note note0 = new Note();
         note0.setContent("Creating note from note object.");
@@ -112,6 +124,8 @@ public class NotesDbTest extends AndroidTestCase {
         assertTrue("Note creation failed.", id != -1);
 
         note0.setTags(Arrays.asList(new String[] {"x", "y", "z"}));
+        note0.setCreateDate(null);
+        note0.setModifyDate(null);
         note0.setContent("new content");
         db.updateNote(note0);
 

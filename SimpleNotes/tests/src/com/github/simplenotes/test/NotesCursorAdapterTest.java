@@ -40,6 +40,11 @@ public class NotesCursorAdapterTest extends AndroidTestCase {
         }
 
         @Override
+        public boolean isNull(int columnIndex) {
+            return rows[position][columnIndex] == null;
+        }
+
+        @Override
         public boolean isAfterLast() {
             return position >= rows.length;
         }
