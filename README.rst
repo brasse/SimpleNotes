@@ -16,5 +16,5 @@ GPLv2.
 Authors
 =======
 
-Mattias Svala <thebrasse@brasse.org>
-Lateef Jackson <lateef.jackson@gmail.com>
+* Mattias Svala <thebrasse@brasse.org>
+* Lateef Jackson <lateef.jackson@gmail.com>
