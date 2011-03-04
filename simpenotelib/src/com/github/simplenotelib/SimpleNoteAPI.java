@@ -36,22 +36,28 @@ public class SimpleNoteAPI {
 
      }
 
+    private void writePostData(URLConnection connection, String data,
+            boolean encode) throws IOException {
+        connection.setDoOutput(true);
+        OutputStream out = null;
+        try {
+            out = connection.getOutputStream();
+            if(encode) {
+                data = new BASE64Encoder().encode(data.getBytes());
+            }
+            out.write(data.getBytes());
+            out.flush();
+        } finally {
+            if (out != null) try { out.close(); } catch (IOException logOrIgnore) {}
+        }
+    }
     private BufferedReader connect(String url, String body, boolean encode) throws IOException{
         BufferedReader buffer = null;
         try {
             URL u = new URL(url);
             URLConnection ucon = u.openConnection();
-            ucon.setDoOutput(true);
-            OutputStream out = null;
-            try {
-                out = ucon.getOutputStream();
-                if(encode) {
-                    body = new BASE64Encoder().encode(body.getBytes());
-                }
-                out.write(body.getBytes());
-                out.flush();
-            } finally {
-                if (out != null) try { out.close(); } catch (IOException logOrIgnore) {}
+            if (body != null) {
+                writePostData(ucon, body, encode);
             }
             buffer = new BufferedReader(new InputStreamReader(ucon.getInputStream()));
         } catch(MalformedURLException me) {
@@ -101,7 +107,7 @@ public class SimpleNoteAPI {
 
     public Note get(String key) throws IOException {
         String url = BASE_URL + DATA_PATH + "/" + key + "?auth=" + this.authToken + "&email=" + this.email;
-        String noteJSON = requestURL(url, "", false);
+        String noteJSON = requestURL(url, null, false);
         return noteFromJSON(noteJSON);
     }
 
