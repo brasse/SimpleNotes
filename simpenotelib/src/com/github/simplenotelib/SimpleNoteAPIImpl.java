@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 
 import com.google.gson.Gson;
 
-public class SimpleNoteAPIImpl {
+public class SimpleNoteAPIImpl implements SimpleNoteAPI {
     public static final String BASE_URL = "https://simple-note.appspot.com/api2";
 
     public static final String LOGIN_URL = "https://simple-note.appspot.com/api/login";
@@ -84,20 +84,25 @@ public class SimpleNoteAPIImpl {
     }
 
 
+    @Override
     public void login() throws IOException {
         String url = LOGIN_URL; 
         String body="email=" + this.email + "&password=" + this.password;
 
         this.authToken = requestURL(url, body, true);
     }
+    
+    @Override
     public String getEmail() {
         return email;
     }
+    
     private Note noteFromJSON(String json) {
         System.out.println("Made it before fromJSON");
         return this.gson.fromJson(json, Note.class);
     }
 
+    @Override
     public Note add(Note note) throws IOException {
         String url = BASE_URL + DATA_PATH + "?auth=" + this.authToken + "&email=" + this.email;
         String body = gson.toJson(note);
@@ -105,6 +110,7 @@ public class SimpleNoteAPIImpl {
         return noteFromJSON(newNoteJSON);
     }
 
+    @Override
     public Note get(String key) throws IOException {
         String url = BASE_URL + DATA_PATH + "/" + key + "?auth=" + this.authToken + "&email=" + this.email;
         String noteJSON = requestURL(url, null, false);

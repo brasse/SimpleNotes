@@ -30,7 +30,7 @@ public class SimpleNoteAPITest extends TestCase {
     }
 
     public void testSimpleNoteAPI() {
-        SimpleNoteAPIImpl sn = new SimpleNoteAPIImpl(email, password);
+        SimpleNoteAPI sn = new SimpleNoteAPIImpl(email, password);
         Assert.assertNotNull(sn.getEmail());
     }
 
@@ -41,7 +41,7 @@ public class SimpleNoteAPITest extends TestCase {
     }
 
     public void testCreateNote() throws IOException {
-        SimpleNoteAPIImpl sn = new SimpleNoteAPIImpl(email, password);
+        SimpleNoteAPI sn = new SimpleNoteAPIImpl(email, password);
         Note newNote = null;
         Note n = new Note();
         n.setContent("This is the minimal content needed");
@@ -53,7 +53,7 @@ public class SimpleNoteAPITest extends TestCase {
     }
 
     public void testGetNote() throws IOException {
-        SimpleNoteAPIImpl sn = new SimpleNoteAPIImpl(email, password);
+        SimpleNoteAPI sn = new SimpleNoteAPIImpl(email, password);
         sn.login();
         Note newNote = null;
         Note n = new Note();
