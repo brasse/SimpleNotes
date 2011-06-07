@@ -13,14 +13,14 @@ import java.util.logging.Logger;
 
 import com.google.gson.Gson;
 
-public class SimpleNoteAPI {
+public class SimpleNoteAPIImpl {
     public static final String BASE_URL = "https://simple-note.appspot.com/api2";
 
     public static final String LOGIN_URL = "https://simple-note.appspot.com/api/login";
     public static final String DATA_PATH = "/data";
     public static final String INDEX_PATH = "/index";
 
-    public static Logger Log = Logger.getLogger(SimpleNoteAPI.class.getName());
+    public static Logger Log = Logger.getLogger(SimpleNoteAPIImpl.class.getName());
     private String email;
     private String password;
 
@@ -29,7 +29,7 @@ public class SimpleNoteAPI {
     public String getAuthToken() {
         return this.authToken;
     }
-    public SimpleNoteAPI(String email, String password) {
+    public SimpleNoteAPIImpl(String email, String password) {
         this.email = email;
         this.password = password;
         this.gson = new Gson();
