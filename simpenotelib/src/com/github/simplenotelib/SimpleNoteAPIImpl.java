@@ -29,13 +29,17 @@ public class SimpleNoteAPIImpl implements SimpleNoteAPI {
     public String getAuthToken() {
         return this.authToken;
     }
-    public SimpleNoteAPIImpl(String email, String password) {
-        this.email = email;
-        this.password = password;
+    public SimpleNoteAPIImpl() {
+        this.email = null;
+        this.password = null;
         this.gson = new Gson();
-
      }
-
+    
+    @Override
+    public void setPassword(String password) {
+        this.password = password;
+    }
+    
     private void writePostData(URLConnection connection, String data,
             boolean encode) throws IOException {
         connection.setDoOutput(true);
@@ -93,7 +97,12 @@ public class SimpleNoteAPIImpl implements SimpleNoteAPI {
     }
     
     @Override
-    public String getEmail() {
+    public void setUserName(String username) {
+        this.email = username;
+    }
+    
+    @Override
+    public String getUserName() {
         return email;
     }
     

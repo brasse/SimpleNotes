@@ -28,9 +28,19 @@ public interface SimpleNoteAPI {
     public abstract Note add(Note note) throws IOException;
 
     /**
+     * Set the username used for all transactions with the SimpleNote service
+     */
+    public abstract void setUserName(String userName);
+    
+    /**
      * Get the username used for all transactions with the SimpleNote service
      * @return the username used with the SimpleNote service
      */
-    public abstract String getEmail();
+    public abstract String getUserName();
+    
+    /**
+     * Set the password to use for the account
+     */
+    public abstract void setPassword(String password);
 
 }
